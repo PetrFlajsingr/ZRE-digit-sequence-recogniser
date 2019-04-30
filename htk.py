@@ -54,7 +54,7 @@ def readhtk(file, return_parmKind_and_sampPeriod=False):
             scale, bias = m[:sampSize*4].view('>f').reshape(2,sampSize/2)
             m = (m.view('>h').reshape(nSamples,sampSize/2)[4:] + bias) / scale
         else:
-            m = m.view('>f').reshape(nSamples,sampSize/4)
+            m = m.view('>f').reshape(nSamples, int(sampSize/4))
         if pk == IREFC:
             m = m / 32767.0
         if pk == WAVEFORM:
@@ -62,7 +62,8 @@ def readhtk(file, return_parmKind_and_sampPeriod=False):
         if parmKind & _K:
             fh.read(1)
     finally:
-        if fh is not file: fh.close()
+        if fh is not file:
+            fh.close()
     return m if not return_parmKind_and_sampPeriod else (m, parmKind, sampPeriod/1e7)
 
 def readhtk_segment_honza(segment, lc=0, rc=0, return_parmKind_and_sampPeriod=False):
