@@ -6,6 +6,10 @@ import htk
 
 def init_argparse():
     parser = argparse.ArgumentParser("ZRE digit sequence recogniser")
+    parser.add_argument('--phonemes', dest='phonemes', type=str, required=True)
+    parser.add_argument('--dict', dest='dict', type=str, required=True)
+    parser.add_argument('--input', dest='input', type=str, required=True)
+    parser.add_argument('--frames', dest='frames', action='store_true')
     return parser
 
 
@@ -38,19 +42,15 @@ def read_phonemes(path: str):
 
 def main():
     args = init_argparse().parse_args()
-    dictionary = read_dictionary('./dicos/zre.dict')
-    phonemes = read_phonemes('./dicos/phonemes')
+    dictionary = read_dictionary(args.dict)
+    phonemes = read_phonemes(args.phonemes)
     model = hmm.HMM(phonemes, dictionary)
     model.build_network()
 
-    m = htk.readhtk('./dev/a30000b1.lik')
+    m = htk.readhtk(args.input)
     for d in m:
         model.step(d)
-
-    print("done")
-    model.print_result()
-
-    model.print()
+    model.print_result(args.frames)
 
 
 if __name__ == "__main__":
